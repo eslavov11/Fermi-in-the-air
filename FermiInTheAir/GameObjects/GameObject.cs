@@ -9,24 +9,19 @@
             this.UpLeftCorner = pos;
             this.HaveCollision = false;
             this.Symbol = symbol;
-            SetPositionsCoordinates();
+                SetPositionsCoordinates();
         }
 
         public int Height { get; set; }
-
         public int Width { get; set; }
-
         public Point UpLeftCorner { get; set; }
-
         public bool HaveCollision { get; set; }
-
         public char Symbol { get; set; }
-
         public Point[] PositionsCoordinates { get; set; }
 
         public void SetPositionsCoordinates()
         {
-            Point[] positions = new Point[Height*Width];
+            Point[] positions = new Point[Height * Width];
             int index = 0;
 
             for (int i = this.UpLeftCorner.X; i < this.UpLeftCorner.X + Height; i++)
@@ -43,6 +38,7 @@
 
         public virtual void Move()
         {
+
             this.UpLeftCorner.X++;
 
             //this may be must check in collision metod
@@ -51,11 +47,12 @@
                 this.HaveCollision = true;
                 this.UpLeftCorner.X--;
             }
+
         }
 
         public override int GetHashCode()
         {
-            int hashCode = 80* this.UpLeftCorner.X + this.UpLeftCorner.Y;
+            int hashCode = 80 * this.UpLeftCorner.X + this.UpLeftCorner.Y;
             return hashCode; //x y coordinates concatenated
         }
     }

@@ -12,11 +12,6 @@ namespace FermiInTheAir
             Console.BufferWidth = Console.WindowWidth;
             Console.CursorVisible = false;
 
-
-            //Music playMusic = new Music();
-            //Thread music = new Thread(playMusic.Play);
-            //music.Start();
-
             FermiInTheAir.Utility.OpeningPage.FrontPageGameName();
             FermiInTheAir.Utility.OpeningPage.OpenPage();
             

@@ -25,6 +25,8 @@ public class Engine
     private Projectile projectile;
     private int sleepTime = 300;
     private Stopwatch difficultyTimer = Stopwatch.StartNew();
+    private Stopwatch gravity = Stopwatch.StartNew();
+    private Stopwatch shootSpan = Stopwatch.StartNew();
     private int destroyObjectSpawnFrequency = 15;
 
     public void Run()
@@ -44,9 +46,9 @@ public class Engine
         while (!settings.GameOver)
         {
             // chance to spawn objects, adjust below for collectables / destroyables           
-            int chanceToSpawn = rnd.Next(0, 100);
+            int chanceToSpawn = rnd.Next(0, 5000);
 
-            status.ClearStatus();
+            //status.ClearStatus();
             status.PrintStatus();
 
             if (Convert.ToInt32(difficultyTimer.ElapsedMilliseconds) > 30000)
@@ -103,7 +105,7 @@ public class Engine
                 {
                     gameObjectsList.Add(collectObject);
                     collectObject.SetPositionsCoordinates();
-                    
+
                 }
             }
 
@@ -131,14 +133,13 @@ public class Engine
 
             while (Console.KeyAvailable)
             {
-                
+
                 plane.Clear();
                 ConsoleKeyInfo keyPressed = Console.ReadKey(true);
 
                 if (keyPressed.Key == ConsoleKey.UpArrow)
                 {
                     plane.Position.X--;
-
                     if (plane.Position.X < 1)
                     {
                         plane.Position.X = 1;
@@ -148,7 +149,6 @@ public class Engine
                 if (keyPressed.Key == ConsoleKey.DownArrow)
                 {
                     plane.Position.X++;
-
                     if (plane.Position.X > settings.Height - plane.PlaneHeight)
                     {
                         plane.Position.X = settings.Height - plane.PlaneHeight;
@@ -158,7 +158,6 @@ public class Engine
                 if (keyPressed.Key == ConsoleKey.LeftArrow)
                 {
                     plane.Position.Y--;
-
                     if (plane.Position.Y < 0)
                     {
                         plane.Position.Y = 0;
@@ -167,7 +166,7 @@ public class Engine
 
                 if (keyPressed.Key == ConsoleKey.RightArrow)
                 {
-                    plane.Position.Y++;
+                    plane.Position.Y ++;
 
                     if (plane.Position.Y > settings.Width - plane.PlaneWidth)
                     {
@@ -177,20 +176,24 @@ public class Engine
 
                 if (keyPressed.Key == ConsoleKey.Spacebar)
                 {
-                    projectile = new Projectile(new Point(plane.Position.X - 1, plane.Position.Y + plane.PlaneWidth / 2));
-
-                    if (CheckCollisionWhitOtherObject(projectile.UpLeftCorner))
+                    if (Convert.ToInt32(shootSpan.ElapsedMilliseconds) > 250)
                     {
-                        projectile.HaveCollision = true;
-                        sounds.DestroyObject();
-                        settings.Score += 5;
-                    }
-                    else
-                    {
-                        gameObjectsList.Add(projectile);
-                    }
+                        projectile = new Projectile(new Point(plane.Position.X - 1, plane.Position.Y + plane.PlaneWidth / 2));
 
-                    PrintGameObject.PrintObject(projectile);
+                        if (CheckCollisionWhitOtherObject(projectile.UpLeftCorner))
+                        {
+                            projectile.HaveCollision = true;
+                            sounds.DestroyObject();
+                            settings.Score += 5;
+                        }
+                        else
+                        {
+                            gameObjectsList.Add(projectile);
+                        }
+
+                        PrintGameObject.PrintObject(projectile);
+                        shootSpan = Stopwatch.StartNew();
+                    }
                 }
 
                 if (keyPressed.Key == ConsoleKey.P)
@@ -221,51 +224,57 @@ public class Engine
 
                 plane.Print();
             }
-
-            while (gameObjectsList.Count > 0)
+            if (Convert.ToInt32(gravity.ElapsedMilliseconds) > 130)
             {
-                current = gameObjectsList[gameObjectsList.Count - 1];
-                gameObjectsList.RemoveAt(gameObjectsList.Count - 1);
-
-                PrintGameObject.ClearObject(current);
-
-                current.Move();
-                current.SetPositionsCoordinates();
-
-                if (CheckCollisionWithPlane(current, plane))
+                while (gameObjectsList.Count > 0)
                 {
-                    current.HaveCollision = true;
-                    if (current.Symbol != '$' && current.Symbol!= '^')
+                    current = gameObjectsList[gameObjectsList.Count - 1];
+                    gameObjectsList.RemoveAt(gameObjectsList.Count - 1);
+
+                    PrintGameObject.ClearObject(current);
+
+
+                    current.Move();
+                    current.SetPositionsCoordinates();
+                    //gravity = Stopwatch.StartNew();
+
+
+
+                    if (CheckCollisionWithPlane(current, plane))
                     {
-                        plane.Lives--;
+                        current.HaveCollision = true;
+                        if (current.Symbol != '$' && current.Symbol != '^')
+                        {
+                            plane.Lives--;
+                        }
+                        else if (current.Symbol == '$')
+                        {
+                            settings.Score += 10;
+                        }
+                        //sounds.Crash();
                     }
-                    else if (current.Symbol == '$')
+                    else if (CheckCollisionWhitOtherObject(current.UpLeftCorner))
                     {
-                        settings.Score += 10;
+                        current.HaveCollision = true;
+                        sounds.DestroyObject();
+                        settings.Score += 5;
                     }
-                    sounds.Crash();
+                    else
+                    {
+                        PrintGameObject.PrintObject(current);
+                        newGameObjectsList.Add(current);
+                    }
                 }
-                else if (CheckCollisionWhitOtherObject(current.UpLeftCorner))
-                {
-                    current.HaveCollision = true;
-                    sounds.DestroyObject();
-                    settings.Score += 5;
-                }
-                else
-                {
-                    PrintGameObject.PrintObject(current);
-                    newGameObjectsList.Add(current);
-                }
+
+                gameObjectsList = newGameObjectsList;
+                newGameObjectsList = new List<GameObject>();
+
+                status.Score = settings.Score;
+                status.Lives = plane.Lives;
+                //Thread.Sleep(sleepTime);
+                gravity = Stopwatch.StartNew();
             }
-
-            gameObjectsList = newGameObjectsList;
-            newGameObjectsList = new List<GameObject>();
-
-            status.Score = settings.Score;
-            status.Lives = plane.Lives;
-            Thread.Sleep(sleepTime);
         }
-
         Settings.PrintGameOver(status.Score);
     }
 

@@ -9,7 +9,7 @@ namespace FermiInTheAir.GameObjects
     public class DestroyObject : GameObject
     {
         const int DestroyObjectHeight = 2;
-        const int DestroyObjectWidth = 2;
+        const int DestroyObjectWidth = 3;
         const char DestroyObjectSymbol = '#';
         private Random rnd = new Random();
 

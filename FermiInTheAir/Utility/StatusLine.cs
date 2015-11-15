@@ -34,7 +34,8 @@ public class StatusLine
         Console.ForegroundColor = ConsoleColor.Black;
         Console.BackgroundColor = ConsoleColor.Gray;
 
-        Console.WriteLine("{0}|{1}|{2}", lives.PadRight(Console.WindowWidth / 3), score.PadRight(Console.WindowWidth / 3), ammo.PadRight(Console.WindowWidth / 3));
+        Console.WriteLine("{0}|{1}|{2}", lives.PadRight(Console.WindowWidth / 3), 
+            score.PadRight(Console.WindowWidth / 3), ammo.PadRight(Console.WindowWidth / 3));
         Console.ResetColor();
 
     }
