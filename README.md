@@ -1,5 +1,4 @@
 # Fermi-in-the-air
-самоFERMIлет
 
 Fermi in the air is a console-based video game, developed by team Fermi for the Advanced C# teamwork project at SoftUni. 
 
